@@ -169,7 +169,7 @@ endif
 call neobundle#rc(expand('~/.vim/bundle'))
 " NeoBundleを更新するための設定
 NeoBundleFetch 'Shougo/neobundle.vim'
-" 読み込むプラグインを記載
+" 読み込むプラグイン
 NeoBundle 'Shougo/vimproc', {
   \ 'build' : {
   \   'windows' : 'make -f make_mingw32.mak',
@@ -210,11 +210,9 @@ NeoBundle 'tyru/restart.vim'
 NeoBundle 'osyo-manga/vim-anzu'
 NeoBundle 'itchyny/calendar.vim'
 NeoBundle 'tyru/caw.vim'
-"NeoBundle 'deton/imactivatemap.vim'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'ujihisa/unite-colorscheme'
-" 必要な時に読み込むプラグインを記載
 NeoBundleLazy 'nosami/Omnisharp', {
   \ 'autoload' : {'filetypes': ['cs']},
   \ 'build' : {
@@ -223,6 +221,8 @@ NeoBundleLazy 'nosami/Omnisharp', {
   \   'unix'    : 'xbuild server/OmniSharp.sln',
   \   }
   \ }
+NeoBundle 'kana/vim-textobj-user'
+NeoBundle 'kana/vim-operator-user'
 " カラースキーマ
 "NeoBundle 'rainux/vim-desert-warm-256'
 "NeoBundle 'altercation/vim-colors-solarized'
@@ -427,15 +427,6 @@ let g:caw_wrap_sp_left = " "
 let g:caw_wrap_sp_right = " "
 let g:caw_wrap_skip_blank_line = 1
 let g:caw_wrap_align = 1
-" }}}
-
-"---------------------------------------
-" imactivatemap.vim {{{
-"---------------------------------------
-if exists('g:imactivatemap_prefixkey')
-  " プレフィックスキーを変更(s(substitute)キー使用不可、clで代替可能)
-  let g:imactivatemap_prefixkey = 's'
-endif
 " }}}
 
 "---------------------------------------
@@ -701,11 +692,11 @@ nnoremap ZZ <Nop>
 nnoremap ZQ <Nop>
 " メニュー表示／非表示
 map <silent> <F2> :if &guioptions =~# 'm' <Bar>
-                 \        set guioptions-=T <Bar>
-                 \        set guioptions-=m <Bar>
+                 \   set guioptions-=T <Bar>
+                 \   set guioptions-=m <Bar>
                  \ else <Bar>
-                 \        set guioptions+=T <Bar>
-                 \        set guioptions+=m <Bar>
+                 \   set guioptions+=T <Bar>
+                 \   set guioptions+=m <Bar>
                  \ endif<CR>
 " }}}
 "---------------------------------------
@@ -833,13 +824,6 @@ vmap [Space]cO <Plug>(caw:jump:comment-prev)
 " （カレント行or選択箇所をレジスタcを使用してヤンク／プットしてヤンク元をコメントアウト）
 nmap [Space]cn "cyy"cp<Plug>(caw:I:toggle)k
 vmap [Space]cn "cygv<Plug>(caw:I:toggle)"cP
-" }}}
-"---------------------------------------
-" imactivatemap.vim {{{
-"---------------------------------------
-" 自前では定義していないが、プラグインにより定義される
-" 現在の設定では's'キーがプレフィックスキーとなり、
-" 'si'などと入力することにより日本語入力状態でInsertモードに入る
 " }}}
 
 "-------------------------------------------------------------------------------
