@@ -1,114 +1,128 @@
+scriptencoding utf-8
 "-------------------------------------------------------------------------------
-" GVIMŠî–{İ’è
+" GVIMåŸºæœ¬è¨­å®š
 "-------------------------------------------------------------------------------
 " {{{
 set ambiwidth=double
 " }}}
 "---------------------------------------
-" ƒtƒHƒ“ƒgİ’è {{{
+" ãƒ•ã‚©ãƒ³ãƒˆè¨­å®š {{{
 "---------------------------------------
-" u‚l‚r ƒSƒVƒbƒNv
-" i”¼Šp‘SŠpF‚l‚r ƒSƒVƒbƒN^ƒTƒCƒY9.5j
-" NOTE: •W€
-"set guifont=MS_Gothic:h9.5:cSHIFTJIS
+if has('win32')
+  " ã€Œï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯ã€
+  " ï¼ˆåŠè§’å…¨è§’ï¼šï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯ï¼ã‚µã‚¤ã‚º9.5ï¼‰
+  " NOTE: æ¨™æº–
+  "set guifont=MS_Gothic:h9.5:cSHIFTJIS
 
-" uConsolasv
-" i”¼ŠpFConsolas^ƒTƒCƒY9.5 or Lucida_Console^ƒTƒCƒY9.5j
-" i‘SŠpF‚l‚r ƒSƒVƒbƒN^ƒTƒCƒY9.5j
-" NOTE: ”¼Šp‘SŠp‚ğ•Ê‚Éİ’è‚·‚éê‡‚ÍA[encoding="UTF-8"]‚Æ‚È‚Á‚Ä‚¢‚È‚¢‚Æ‚¢‚¯‚È‚¢
-"       [encoding="UTF-8"]‚É‚·‚é‚É‚ÍvimƒtƒHƒ‹ƒ_‚Ìuswitches/enabledv‚Éuswitches/catalogv‚Ìuutf-8.vimv‚ğƒRƒs[‚·‚é
-"       [encoding="UTF-8"]‚É•ÏX‚·‚é‚Æ“ú–{ŒêŠÖ˜A‚Å—lX‚È–â‘è‚ª”­¶‚·‚é
-"set guifont=Consolas:h9.5,Lucida_Console:h9.5
-"set guifontwide=MS_Gothic:h9.5:cSHIFTJIS
+  " ã€ŒConsolasã€
+  " ï¼ˆåŠè§’ï¼šConsolasï¼ã‚µã‚¤ã‚º9.5 or Lucida_Consoleï¼ã‚µã‚¤ã‚º9.5ï¼‰
+  " ï¼ˆå…¨è§’ï¼šï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯ï¼ã‚µã‚¤ã‚º9.5ï¼‰
+  " NOTE: åŠè§’å…¨è§’ã‚’åˆ¥ã«è¨­å®šã™ã‚‹å ´åˆã¯ã€[encoding="UTF-8"]ã¨ãªã£ã¦ã„ãªã„ã¨ã„ã‘ãªã„
+  "       [encoding="UTF-8"]ã«ã™ã‚‹ã«ã¯vimãƒ•ã‚©ãƒ«ãƒ€ã®ã€Œswitches/enabledã€ã«ã€Œswitches/catalogã€ã®ã€Œutf-8.vimã€ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
+  "       [encoding="UTF-8"]ã«å¤‰æ›´ã™ã‚‹ã¨æ—¥æœ¬èªé–¢é€£ã§æ§˜ã€…ãªå•é¡ŒãŒç™ºç”Ÿã™ã‚‹
+  "set guifont=Consolas:h9.5,Lucida_Console:h9.5
+  "set guifontwide=MS_Gothic:h9.5:cSHIFTJIS
 
-" uRicty_Diminishedv
-" i”¼Šp‘SŠpFRicty_Diminished^ƒTƒCƒY10.5j
-" NOTE: “ú–{Œê‚ª­‚µŒ©‚Ã‚ç‚¢‚ªA‰p”š‚ÍŒ©‚â‚·‚¢
-"set guifont=Ricty_Diminished:h10.5:cSHIFTJIS
+  " ã€ŒRicty_Diminishedã€
+  " ï¼ˆåŠè§’å…¨è§’ï¼šRicty_Diminishedï¼ã‚µã‚¤ã‚º10.5ï¼‰
+  " NOTE: æ—¥æœ¬èªãŒå°‘ã—è¦‹ã¥ã‚‰ã„ãŒã€è‹±æ•°å­—ã¯è¦‹ã‚„ã™ã„
+  "set guifont=Ricty_Diminished:h10.5:cSHIFTJIS
 
-" uMeiryoKe_Consolev
-" i”¼Šp‘SŠpFMeiryoKe_Console^ƒTƒCƒY9.5j
-" NOTE: “ú–{Œê‚ÍãY—í‚¾‚¯‚ÇA‰p”š‚Æ‘SŠp”¼ŠpƒJƒbƒR‚ªŒ©‚Ã‚ç‚¢
-"set guifont=MeiryoKe_Console:h9.5:cSHIFTJIS
+  " ã€ŒMeiryoKe_Consoleã€
+  " ï¼ˆåŠè§’å…¨è§’ï¼šMeiryoKe_Consoleï¼ã‚µã‚¤ã‚º9.5ï¼‰
+  " NOTE: æ—¥æœ¬èªã¯ç¶ºéº—ã ã‘ã©ã€è‹±æ•°å­—ã¨å…¨è§’åŠè§’ã‚«ãƒƒã‚³ãŒè¦‹ã¥ã‚‰ã„
+  "set guifont=MeiryoKe_Console:h9.5:cSHIFTJIS
 
-" uConsolasv
-" i”¼ŠpFConsolas^ƒTƒCƒY9j
-" i‘SŠpFƒtƒHƒ“ƒgƒŠƒ“ƒN‚³‚ê‚½ƒtƒHƒ“ƒg^ƒTƒCƒY“¯‚¶j
-" NOTE: ƒŒƒWƒXƒgƒŠ‚ğC³‚µƒtƒHƒ“ƒgƒŠƒ“ƒN‚µ‚Ä‚¢‚È‚¢ê‡‚Í“ú–{Œê‚ª‰»‚¯‚é
-set guifont=Consolas:h9:cSHIFTJIS
-" }}}
+  " ã€ŒConsolasã€
+  " ï¼ˆåŠè§’ï¼šConsolasï¼ã‚µã‚¤ã‚º9ï¼‰
+  " ï¼ˆå…¨è§’ï¼šãƒ•ã‚©ãƒ³ãƒˆãƒªãƒ³ã‚¯ã•ã‚ŒãŸãƒ•ã‚©ãƒ³ãƒˆï¼ã‚µã‚¤ã‚ºåŒã˜ï¼‰
+  " NOTE: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚’ä¿®æ­£ã—ãƒ•ã‚©ãƒ³ãƒˆãƒªãƒ³ã‚¯ã—ã¦ã„ãªã„å ´åˆã¯æ—¥æœ¬èªãŒåŒ–ã‘ã‚‹
+  set guifont=Consolas:h9:cSHIFTJIS
 
-"---------------------------------------
-" ƒŒƒ“ƒ_ƒŠƒ“ƒOƒIƒvƒVƒ‡ƒ“
-"---------------------------------------
-" {{{
-" DirectWrite‚ğ—LŒø‚É‚·‚éi–³Œø:‹ój
-" NOTE: renderoptions‚Í[encoding="UTF-8"]A[has('directx')]AVistaˆÈ~‚Åg—p‰Â”\
-if has('directx') && &encoding ==# 'utf-8'
-  set renderoptions=type:directx
-  "set renderoptions=type:directx,renmode:5,taamode:1
+elseif has('unix')
+  " ã€ŒMonospaceã€
+  " ï¼ˆåŠè§’å…¨è§’ï¼šMonospaceï¼ã‚µã‚¤ã‚º12ï¼‰
+  " NOTE: ç«¯æœ«ã®æ¨™æº–ãƒ•ã‚©ãƒ³ãƒˆã¨åŒã˜
+  set guifont=Monospace\ 12
 endif
 " }}}
 
 "---------------------------------------
-" Fƒe[ƒ} {{{
+" ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚ªãƒ—ã‚·ãƒ§ãƒ³
+"---------------------------------------
+" {{{
+if has('win32')
+  " DirectWriteã‚’æœ‰åŠ¹ã«ã™ã‚‹ï¼ˆç„¡åŠ¹:ç©ºï¼‰
+  " NOTE: renderoptionsã¯[encoding="UTF-8"]ã€[has('directx')]ã€Vistaä»¥é™ã§ä½¿ç”¨å¯èƒ½
+  if has('directx') && &encoding ==# 'utf-8'
+    set renderoptions=type:directx
+    "set renderoptions=type:directx,renmode:5,taamode:1
+  endif
+  " }}}
+endif
+
+"---------------------------------------
+" è‰²ãƒ†ãƒ¼ãƒ {{{
 "---------------------------------------
 "colorscheme pablo
 colorscheme molokai
 " }}}
 
 "---------------------------------------
-" ƒƒjƒ…[^ƒc[ƒ‹ƒo[ {{{
+" ãƒ¡ãƒ‹ãƒ¥ãƒ¼ï¼ãƒ„ãƒ¼ãƒ«ãƒãƒ¼ {{{
 "---------------------------------------
-" ƒƒjƒ…[íœ
+" ãƒ¡ãƒ‹ãƒ¥ãƒ¼å‰Šé™¤
 set guioptions-=m
-" ƒc[ƒ‹ƒo[íœ
+" ãƒ„ãƒ¼ãƒ«ãƒãƒ¼å‰Šé™¤
 set guioptions-=T
 " }}}
 
 "---------------------------------------
-" ƒXƒNƒ[ƒ‹ƒo[ {{{
+" ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒãƒ¼ {{{
 "---------------------------------------
-" ‰¡ƒXƒNƒ[ƒ‹ƒo[‚ğ•\¦
+" æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒãƒ¼ã‚’è¡¨ç¤º
 set guioptions+=b
 " }}}
 
 "---------------------------------------
-" ƒ^ƒuƒ‰ƒCƒ“ {{{
+" ã‚¿ãƒ–ãƒ©ã‚¤ãƒ³ {{{
 "---------------------------------------
-" ƒ^ƒuƒy[ƒW‚ğí‚É•\¦
+" ã‚¿ãƒ–ãƒšãƒ¼ã‚¸ã‚’å¸¸ã«è¡¨ç¤º
 set showtabline=2
-" GVim‚Å‚àƒeƒLƒXƒgƒx[ƒX‚Ìƒ^ƒuƒy[ƒW‚ğg‚¤
+" GVimã§ã‚‚ãƒ†ã‚­ã‚¹ãƒˆãƒ™ãƒ¼ã‚¹ã®ã‚¿ãƒ–ãƒšãƒ¼ã‚¸ã‚’ä½¿ã†
 set guioptions-=e
 " }}}
 
 "---------------------------------------
-" ƒEƒBƒ“ƒhƒE {{{
+" ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ {{{
 "---------------------------------------
-"" ƒEƒCƒ“ƒhƒE‚Ì•
-"set columns=120
-"" ƒEƒCƒ“ƒhƒE‚Ì‚‚³
-"set lines=39
-" ƒEƒBƒ“ƒhƒE‚ğÅ‘å‰»‚µ‚Ä‹N“®
-autocmd GUIEnter * simalt ~x
-" ƒEƒCƒ“ƒhƒE‚Ì•\¦ˆÊ’ui¶ã‚ÌÀ•Wj
+if has('win32')
+  " ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æœ€å¤§åŒ–ã—ã¦èµ·å‹•
+  autocmd GUIEnter * simalt ~x
+elseif has('unix')
+  " ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®å¹…
+  set columns=120
+  " ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®é«˜ã•
+  set lines=39
+endif
+" ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºä½ç½®ï¼ˆå·¦ä¸Šã®åº§æ¨™ï¼‰
 winpos 50 20
-" ƒnƒCƒ‰ƒCƒg—LŒø
+" ãƒã‚¤ãƒ©ã‚¤ãƒˆæœ‰åŠ¹
 if &t_Co > 2 || has('gui_running')
   syntax on
   set hlsearch
 endif
-" ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Ì‚‚³(GUIg—p)
+" ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã®é«˜ã•(GUIä½¿ç”¨æ™‚)
 set cmdheight=2
 " }}}
 
 "---------------------------------------
-" ƒ}ƒEƒX {{{
+" ãƒã‚¦ã‚¹ {{{
 "---------------------------------------
-" ‚Ç‚Ìƒ‚[ƒh‚Å‚àƒ}ƒEƒX‚ğg‚¦‚é‚æ‚¤‚É‚·‚é
+" ã©ã®ãƒ¢ãƒ¼ãƒ‰ã§ã‚‚ãƒã‚¦ã‚¹ã‚’ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 set mouse=a
-" ƒ}ƒEƒX‚ÌˆÚ“®‚ÅƒtƒH[ƒJƒX‚ğ©“®“I‚ÉØ‘Ö‚¦‚È‚¢ (mousefocus:Ø‘Ö‚é)
+" ãƒã‚¦ã‚¹ã®ç§»å‹•ã§ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’è‡ªå‹•çš„ã«åˆ‡æ›¿ãˆãªã„ (mousefocus:åˆ‡æ›¿ã‚‹)
 set nomousefocus
-" “ü—Í‚Éƒ}ƒEƒXƒ|ƒCƒ“ƒ^‚ğ‰B‚· (nomousehide:‰B‚³‚È‚¢)
+" å…¥åŠ›æ™‚ã«ãƒã‚¦ã‚¹ãƒã‚¤ãƒ³ã‚¿ã‚’éš ã™ (nomousehide:éš ã•ãªã„)
 set mousehide
 " }}}
