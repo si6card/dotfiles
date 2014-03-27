@@ -1,4 +1,22 @@
+"-------------------------------------------------------------------------------
+" Initialize GVIM
+"-------------------------------------------------------------------------------
+" {{{
 scriptencoding utf-8
+" autocmd
+augroup MyGVimrc
+  autocmd!
+augroup END
+" autocmd command
+command! -nargs=* Autocmd autocmd MyGVimrc <args>
+command! -nargs=* AutocmdFT autocmd MyGVimrc FileType <args>
+" 環境判定用変数
+" NOTE: 今は未使用
+let s:windows = has('win32') || has('win64') || has('win32unix')
+let s:unix = has('unix')
+let s:mac = has('mac') || has('macunix')
+" }}}
+
 "-------------------------------------------------------------------------------
 " GVIM基本設定
 "-------------------------------------------------------------------------------
@@ -44,6 +62,7 @@ elseif has('unix')
   " （半角全角：Monospace／サイズ12）
   " NOTE: 端末の標準フォントと同じ
   set guifont=Monospace\ 12
+
 endif
 " }}}
 
@@ -98,7 +117,7 @@ set guioptions-=e
 "---------------------------------------
 if has('win32')
   " ウィンドウを最大化して起動
-  autocmd GUIEnter * simalt ~x
+  Autocmd GUIEnter * simalt ~x
 elseif has('unix')
   " ウインドウの幅
   set columns=120
@@ -106,7 +125,7 @@ elseif has('unix')
   set lines=39
 endif
 " ウインドウの表示位置（左上の座標）
-winpos 50 20
+winpos 50 30
 " ハイライト有効
 if &t_Co > 2 || has('gui_running')
   syntax on
@@ -125,4 +144,13 @@ set mouse=a
 set nomousefocus
 " 入力時にマウスポインタを隠す (nomousehide:隠さない)
 set mousehide
+" }}}
+
+"-------------------------------------------------------------------------------
+" Finalize
+"-------------------------------------------------------------------------------
+" {{{
+unlet s:windows
+unlet s:unix
+unlet s:mac
 " }}}

@@ -1,5 +1,5 @@
 "-------------------------------------------------------------------------------
-" Initialize
+" Initialize VIM
 "-------------------------------------------------------------------------------
 " {{{
 scriptencoding utf-8
@@ -10,7 +10,8 @@ augroup END
 " autocmd command
 command! -nargs=* Autocmd autocmd MyVimrc <args>
 command! -nargs=* AutocmdFT autocmd MyVimrc FileType <args>
-" 環境判定用変数(未使用)
+" 環境判定用変数
+" NOTE: 今は未使用
 let s:windows = has('win32') || has('win64') || has('win32unix')
 let s:unix = has('unix')
 let s:mac = has('mac') || has('macunix')
@@ -174,10 +175,6 @@ endif
 " 改行コードの自動認識
 "set fileformats=dos,unix,mac
 set fileformats=unix,dos,mac
-" □とか○の文字があってもカーソル位置がずれないようにする
-if exists('&ambiwidth')
-  set ambiwidth=double
-endif
 " }}}
 
 "-------------------------------------------------------------------------------
@@ -721,6 +718,8 @@ nnoremap Q <Nop>
 " 押し間違え防止（～して閉じる系）
 nnoremap ZZ <Nop>
 nnoremap ZQ <Nop>
+" 検索時強調表示停止
+nnoremap <silent> [Space]n :<C-u>nohlsearch<CR>
 " メニュー表示／非表示
 map <silent> <F2> :if &guioptions =~# 'm' <Bar>
                  \   set guioptions-=T <Bar>
