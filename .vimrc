@@ -3,25 +3,50 @@
 "-------------------------------------------------------------------------------
 " {{{
 scriptencoding utf-8
-" autocmd
+" }}}
+"---------------------------------------
+" autocmd {{{
+"---------------------------------------
 augroup MyVimrc
   autocmd!
 augroup END
 " autocmd command
 command! -nargs=* Autocmd autocmd MyVimrc <args>
 command! -nargs=* AutocmdFT autocmd MyVimrc FileType <args>
-" 環境判定用変数
-" NOTE: 今は未使用
-let s:windows = has('win32') || has('win64') || has('win32unix')
-let s:unix = has('unix')
-let s:mac = has('mac') || has('macunix')
+" }}}
+"---------------------------------------
+" 環境判定用変数 {{{
+"---------------------------------------
+let s:is_windows = has('win32') || has('win64') || has('win32unix')
+let s:is_unix = has('unix')
+let s:is_mac = has('mac') || has('macunix')
+" }}}
+"---------------------------------------
+" エンコード指定 {{{
+"---------------------------------------
+if s:is_windows
+  " windows の場合は標準のまま使用
+elseif s:is_unix
+  set encoding=utf-8
+elseif s:is_mac
+  set encoding=utf-8
+endif
+" }}}
+"---------------------------------------
+" 環境変数 {{{
+"---------------------------------------
+if has('vim_starting')
+  if !exists('$MYGVIMRC')
+    let $MYGVIMRC=$HOME.'/.gvimrc'
+  endif
+endif
 " }}}
 
 "-------------------------------------------------------------------------------
 " 基本設定
 "-------------------------------------------------------------------------------
 " {{{
-" This is vim, not vi.
+" vi？なにそれおいしいの？
 set nocompatible
 " 行番号を表示する
 set number
@@ -102,6 +127,9 @@ set scrolloff=5
 set showtabline=2
 " K は man ではなく help がいい
 set keywordprg=:help
+" 改行時にコメントしない
+set formatoptions-=ro
+AutocmdFT * setlocal formatoptions-=ro
 " }}}
 
 "-------------------------------------------------------------------------------
@@ -114,6 +142,11 @@ set keywordprg=:help
 if has('vim_starting')
   set runtimepath+=~/.vim/
 endif
+" }}}
+"---------------------------------------
+" vim {{{
+"---------------------------------------
+AutocmdFT vim setlocal tabstop=2 shiftwidth=2 softtabstop=2
 " }}}
 
 "-------------------------------------------------------------------------------
@@ -263,6 +296,7 @@ NeoBundle 'kana/vim-operator-user'
 "NeoBundle 'jeffreyiacono/vim-colors-wombat'
 "NeoBundle 'nanotech/jellybeans.vim'
 NeoBundle 'tomasr/molokai'
+colorscheme molokai
 " 読み込んだプラグインも含め、ファイルタイプの検出、ファイルタイプ別プラグイン/インデントを有効化する
 filetype plugin indent on
 " インストールのチェック
@@ -520,14 +554,14 @@ let g:quickrun_config['_'] = {
   \ 'runner/vimproc/updatetime' : 40,
   \ }
 " C#用設定（MAC用設定は未検証）
-if has('mac')
+if s:is_mac
   let g:quickrun_config['cs'] = {
     \ 'command' : 'cs',
     \ 'runmode' : 'simple',
     \ 'exec' : ['%c %s > /dev/null', 'mono "%S:p:r:gs?/?\\?.exe" %a', ':call delete("%S:p:r.exe")'],
     \ 'tempfile' : '{tempname()}.cs',
     \ }
-else
+elseif s:is_windows
   let g:quickrun_config['cs'] = {
     \ 'hook/output_encode/enable' : 1,
     \ 'hook/output_encode/encoding' : 'cp932',
@@ -761,6 +795,12 @@ nnoremap <silent> ev :<C-u>edit $MYVIMRC<CR>
 nnoremap <silent> eg :<C-u>edit $MYGVIMRC<CR>
 " }}}
 "---------------------------------------
+" help {{{
+"---------------------------------------
+" q で help を閉じる
+AutocmdFT help nnoremap <buffer> q <C-w>c
+" }}}
+"---------------------------------------
 " Unite.vim {{{
 "---------------------------------------
 nnoremap [Unite] <Nop>
@@ -863,12 +903,11 @@ vmap [Space]cn "cygv<Plug>(caw:I:toggle)"cP
 "---------------------------------------
 " 現在開いているファイルのパスに移動する
 Autocmd BufEnter * execute ":lcd " . expand("%:p:h")
-"autocmd BufEnter,BufRead * execute ":lcd " . expand("%:p:h")
 " vimgrep使用時にQuickFixで表示させるautocmd
 Autocmd QuickfixCmdPost vimgrep cw
-" コメントのオートインデントをOFF
-" 参考ページ: http://d.hatena.ne.jp/dayflower/20081208/1228725403
-AutocmdFT * let &l:comments=join(filter(split(&l:comments, ','), 'v:val =~ "^[sme]"'), ',')
+"" コメントのオートインデントをOFF
+"" 参考ページ: http://d.hatena.ne.jp/dayflower/20081208/1228725403
+"AutocmdFT * let &l:comments=join(filter(split(&l:comments, ','), 'v:val =~ "^[sme]"'), ',')
 " }}}
 "---------------------------------------
 " 起動時 {{{
@@ -888,18 +927,12 @@ function! s:UniteStartUpExec()
   :UniteStartUp
 endfunction
 " }}}
-"---------------------------------------
-" help {{{
-"---------------------------------------
-" q で help を閉じる
-AutocmdFT help nnoremap <buffer> q <C-w>c
-" }}}
 
 "-------------------------------------------------------------------------------
 " Finalize
 "-------------------------------------------------------------------------------
 " {{{
-unlet s:windows
-unlet s:unix
-unlet s:mac
+unlet s:is_windows
+unlet s:is_unix
+unlet s:is_mac
 " }}}

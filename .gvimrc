@@ -11,10 +11,9 @@ augroup END
 command! -nargs=* Autocmd autocmd MyGVimrc <args>
 command! -nargs=* AutocmdFT autocmd MyGVimrc FileType <args>
 " 環境判定用変数
-" NOTE: 今は未使用
-let s:windows = has('win32') || has('win64') || has('win32unix')
-let s:unix = has('unix')
-let s:mac = has('mac') || has('macunix')
+let s:is_windows = has('win32') || has('win64') || has('win32unix')
+let s:is_unix = has('unix')
+let s:is_mac = has('mac') || has('macunix')
 " }}}
 
 "-------------------------------------------------------------------------------
@@ -26,7 +25,7 @@ set ambiwidth=double
 "---------------------------------------
 " フォント設定 {{{
 "---------------------------------------
-if has('win32')
+if s:is_windows
   " 「ＭＳ ゴシック」
   " （半角全角：ＭＳ ゴシック／サイズ9.5）
   " NOTE: 標準
@@ -57,7 +56,7 @@ if has('win32')
   " NOTE: レジストリを修正しフォントリンクしていない場合は日本語が化ける
   set guifont=Consolas:h9:cSHIFTJIS
 
-elseif has('unix')
+elseif s:is_unix
   " 「Monospace」
   " （半角全角：Monospace／サイズ12）
   " NOTE: 端末の標準フォントと同じ
@@ -70,7 +69,7 @@ endif
 " レンダリングオプション
 "---------------------------------------
 " {{{
-if has('win32')
+if s:is_windows
   " DirectWriteを有効にする（無効:空）
   " NOTE: renderoptionsは[encoding="UTF-8"]、[has('directx')]、Vista以降で使用可能
   if has('directx') && &encoding ==# 'utf-8'
@@ -115,10 +114,10 @@ set guioptions-=e
 "---------------------------------------
 " ウィンドウ {{{
 "---------------------------------------
-if has('win32')
+if s:is_windows
   " ウィンドウを最大化して起動
   Autocmd GUIEnter * simalt ~x
-elseif has('unix')
+elseif s:is_unix
   " ウインドウの幅
   set columns=120
   " ウインドウの高さ
@@ -150,7 +149,7 @@ set mousehide
 " Finalize
 "-------------------------------------------------------------------------------
 " {{{
-unlet s:windows
-unlet s:unix
-unlet s:mac
+unlet s:is_windows
+unlet s:is_unix
+unlet s:is_mac
 " }}}
