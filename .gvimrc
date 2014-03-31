@@ -12,8 +12,8 @@ command! -nargs=* Autocmd autocmd MyGVimrc <args>
 command! -nargs=* AutocmdFT autocmd MyGVimrc FileType <args>
 " 環境判定用変数
 let s:is_windows = has('win32') || has('win64') || has('win32unix')
-let s:is_unix = has('unix')
 let s:is_mac = has('mac') || has('macunix')
+let s:is_unix = has('unix')
 " }}}
 
 "-------------------------------------------------------------------------------
@@ -55,6 +55,8 @@ if s:is_windows
   " （全角：フォントリンクされたフォント／サイズ同じ）
   " NOTE: レジストリを修正しフォントリンクしていない場合は日本語が化ける
   set guifont=Consolas:h9:cSHIFTJIS
+
+elseif s:is_mac
 
 elseif s:is_unix
   " 「Monospace」
@@ -117,6 +119,11 @@ set guioptions-=e
 if s:is_windows
   " ウィンドウを最大化して起動
   Autocmd GUIEnter * simalt ~x
+elseif s:is_mac
+  " ウインドウの幅
+  set columns=120
+  " ウインドウの高さ
+  set lines=39
 elseif s:is_unix
   " ウインドウの幅
   set columns=120
@@ -150,6 +157,6 @@ set mousehide
 "-------------------------------------------------------------------------------
 " {{{
 unlet s:is_windows
-unlet s:is_unix
 unlet s:is_mac
+unlet s:is_unix
 " }}}

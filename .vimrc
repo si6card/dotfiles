@@ -18,17 +18,17 @@ command! -nargs=* AutocmdFT autocmd MyVimrc FileType <args>
 " 環境判定用変数 {{{
 "---------------------------------------
 let s:is_windows = has('win32') || has('win64') || has('win32unix')
-let s:is_unix = has('unix')
 let s:is_mac = has('mac') || has('macunix')
+let s:is_unix = has('unix')
 " }}}
 "---------------------------------------
 " エンコード指定 {{{
 "---------------------------------------
 if s:is_windows
   " windows の場合は標準のまま使用
-elseif s:is_unix
-  set encoding=utf-8
 elseif s:is_mac
+  set encoding=utf-8
+elseif s:is_unix
   set encoding=utf-8
 endif
 " }}}
@@ -933,6 +933,6 @@ endfunction
 "-------------------------------------------------------------------------------
 " {{{
 unlet s:is_windows
-unlet s:is_unix
 unlet s:is_mac
+unlet s:is_unix
 " }}}
