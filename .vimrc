@@ -33,12 +33,22 @@ elseif s:is_unix
 endif
 " }}}
 "---------------------------------------
+" runtimepath設定 {{{
+"---------------------------------------
+" vim起動時のみruntimepathに ~/.vim を追加
+if has('vim_starting')
+  set runtimepath+=~/.vim/
+endif
+" }}}
+"---------------------------------------
 " 環境変数 {{{
 "---------------------------------------
 if has('vim_starting')
   if !exists('$MYGVIMRC')
     let $MYGVIMRC=$HOME.'/.gvimrc'
   endif
+  " Disable netrw.vim
+  let g:loaded_netrwPlugin = 1
 endif
 " }}}
 
@@ -65,13 +75,15 @@ set directory=~/.vim/swp
 if !isdirectory($HOME.'/.vim/swp')
   call mkdir($HOME.'/.vim/swp', 'p')
 endif
+" バッファを隠れた状態にする
+set hidden
 " <Tab>表示
 set list
 " listで表示する文字設定
 set lcs=tab:>-,trail:_,extends:\
 " ファイル内の <tab> が対応する空白の数
 set tabstop=4 shiftwidth=4 softtabstop=4
-" <Tab>でTabを入力
+" <Tab>でSpaceを入力
 set expandtab
 " インデントを shiftwidth の倍数で丸め
 set shiftround
@@ -105,10 +117,12 @@ set showcmd
 set title
 " 挿入モード・検索モードでのデフォルトのIME状態設定
 set iminsert=0 imsearch=0
+" cindent有効
+set cindent
 " ステータスラインを常に表示
 set laststatus=2
 " シンタックス
-syntax on
+syntax enable
 " 画面最後の行をできる限り表示する
 set display=lastline
 " migemoによるローマ字入力かなインクリメンタルサーチを有効化
@@ -135,18 +149,67 @@ AutocmdFT * setlocal formatoptions-=ro
 "-------------------------------------------------------------------------------
 " ファイルタイプ別基本設定
 "-------------------------------------------------------------------------------
-" runtimepath設定 {{{
-"---------------------------------------
-" vim起動時のみruntimepathに ~/.vim を追加
-" NOTE: ファイルタイプ別設定は ~/.vim/ftplugin 内で定義
-if has('vim_starting')
-  set runtimepath+=~/.vim/
-endif
-" }}}
-"---------------------------------------
 " vim {{{
 "---------------------------------------
-AutocmdFT vim setlocal tabstop=2 shiftwidth=2 softtabstop=2
+function! s:FileTypeSettings_vim()
+  setlocal tabstop=2 shiftwidth=2 softtabstop=2
+endfunction
+AutocmdFT vim call s:FileTypeSettings_vim()
+" }}}
+"---------------------------------------
+" c {{{
+"---------------------------------------
+function! s:FileTypeSettings_c()
+  " <TAB>入力を<TAB>にする
+  setlocal noexpandtab
+  " switch-case文のインデントを調整
+  setlocal cinoptions+=:0
+endfunction
+AutocmdFT c call s:FileTypeSettings_c()
+" }}}
+"---------------------------------------
+" markdown {{{
+"---------------------------------------
+function! s:FileTypeSettings_markdown()
+  " 折り返しを有効にする
+  setlocal wrap
+  " 80文字で折り返す
+  setlocal textwidth=80
+  " マルチバイト文字の場合も折り返しを有効にする
+  setlocal formatoptions+=m
+
+  " <TAB>入力をスペースにする
+  setlocal expandtab
+
+  " 入れ子のリストを折りたたむ
+  setlocal foldmethod=expr foldexpr=MkdCheckboxFold(v:lnum) foldtext=MkdCheckboxFoldText()
+  function! MkdCheckboxFold(lnum)
+    let line = getline(a:lnum)
+    let next = getline(a:lnum + 1)
+    if MkdIsNoIndentCheckboxLine(line) && MkdHasIndentLine(next)
+      return 1
+    elseif (MkdIsNoIndentCheckboxLine(next) || next =~ '^$') && !MkdHasIndentLine(next)
+      return '<1'
+    endif
+    return '='
+  endfunction
+  function! MkdIsNoIndentCheckboxLine(line)
+    return a:line =~ '^- \[[ x]\] '
+  endfunction
+  function! MkdHasIndentLine(line)
+    return a:line =~ '^[[:blank:]]\+'
+  endfunction
+  function! MkdCheckboxFoldText()
+    return getline(v:foldstart) . ' (' . (v:foldend - v:foldstart) . ' lines) '
+  endfunction
+
+  "" 色指定
+  "syntax match MkdCheckboxMark /-\s\[x\]\s.\+/ display containedin=ALL
+  "highlight MkdCheckboxMark guifg=green ctermfg=green
+  "syntax match MkdCheckboxUnmark /-\s\[\s\]\s.\+/ display containedin=ALL
+  "highlight MkdCheckboxUnmark guifg=green ctermfg=red
+endfunction
+AutocmdFT markdown call s:FileTypeSettings_markdown()
 " }}}
 
 "-------------------------------------------------------------------------------
@@ -219,7 +282,7 @@ set fileformats=unix,dos,mac
 runtime macros/matchit.vim
 " }}}
 "---------------------------------------
-" NeoBundle {{{
+" Initialize NeoBundle {{{
 "---------------------------------------
 " vim起動時のみruntimepathにneobundle.vimを追加
 if has('vim_starting')
@@ -230,7 +293,14 @@ endif
 call neobundle#rc(expand('~/.vim/bundle'))
 " NeoBundleを更新するための設定
 NeoBundleFetch 'Shougo/neobundle.vim'
-" 読み込むプラグイン
+" }}}
+"---------------------------------------
+" プラグイン読込 {{{
+"---------------------------------------
+if has('clientserver')
+  NeoBundle 'thinca/vim-singleton'
+  call singleton#enable()
+endif
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'Shougo/vimproc', {
   \ 'build' : {
@@ -238,50 +308,167 @@ NeoBundle 'Shougo/vimproc', {
   \   'cygwin'  : 'make -f make_cygwin.mak ',
   \   'mac'     : 'make -f make_mac.mak    ',
   \   'unix'    : 'make -f make_unix.mak   ',
-  \   }
+  \   },
   \ }
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/neomru.vim', {
+NeoBundleLazy 'Shougo/unite.vim', {
+  \ 'autoload' : {
+  \   'commands' : [
+  \     {'name' : 'Unite',
+  \      'complete' : 'customlist,unite#complete_source'},
+  \     'UniteWithCursorWord', 'UniteWithInput'
+  \     ]
+  \   },
+  \ }
+NeoBundleLazy 'Shougo/neomru.vim', {
   \ 'depends' : 'Shougo/unite.vim',
+  \ 'autoload' : {
+  \   'unite_sources' : [
+  \     'file_mru',
+  \     'directory_mru',
+  \     ],
+  \   },
   \ }
-NeoBundle 'Shougo/vimshell'
-NeoBundle 'supermomonga/vimshell-kawaii.vim', {
-  \ 'depends' : 'Shougo/vimshell',
+NeoBundleLazy 'Shougo/vimshell', {
+  \ 'autoload' : {
+  \   'commands' : [
+  \     {'name' : 'VimShell',
+  \      'complete' : 'customlist,vimshell#complete'},
+  \     'VimShellExecute', 'VimShellInteractive',
+  \     'VimShellTerminal', 'VimShellPop'
+  \     ],
+  \   'mappings' : [
+  \     '<Plug>(vimshell_switch)'
+  \     ]
+  \   },
   \ }
-NeoBundle 'Shougo/vimfiler', {
+NeoBundleLazy 'Shougo/vimfiler', {
   \ 'depends' : 'Shougo/unite.vim',
+  \ 'autoload' : {
+  \   'commands' : [
+  \     {'name' : 'VimFiler',
+  \      'complete' : 'customlist,vimfiler#complete'},
+  \     'VimFilerExplorer',
+  \     'Edit', 'Read', 'Source', 'Write',
+  \     ],
+  \   'mappings' : [
+  \     '<Plug>(vimfiler_'
+  \     ],
+  \   'explorer' : 1,
+  \   },
   \ }
-NeoBundle 'Shougo/unite-outline', {
+NeoBundleLazy 'Shougo/unite-outline', {
   \ 'depends' : 'Shougo/unite.vim',
+  \ 'autoload' : {
+  \   'unite_sources' : ['outline'],
+  \   },
   \ }
-NeoBundle 'thinca/vim-quickrun'
-NeoBundle 'osyo-manga/shabadou.vim', {
+NeoBundleLazy 'thinca/vim-quickrun', {
+  \ 'autoload' : {
+  \   'commands' : 'QuickRun',
+  \   'mappings' : [
+  \     '<Plug>(quickrun'
+  \     ],
+  \   },
+  \ }
+NeoBundleLazy 'osyo-manga/shabadou.vim', {
   \ 'depends' : 'thinca/vim-quickrun',
+  \ 'autoload' : {
+  \   'commands' : 'QuickRun',
+  \   'mappings' : [
+  \     '<Plug>(quickrun'
+  \     ],
+  \   },
   \ }
-NeoBundle 'Shougo/neocomplete'
-NeoBundle 'Shougo/neosnippet'
-NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'koron/codic-vim'
-NeoBundle 'rhysd/unite-codic.vim', {
-  \ 'depends' : 'Shougo/unite.vim',
+NeoBundleLazy 'Shougo/neocomplete', {
+  \ 'autoload' : {
+  \   'insert' : 1,
+  \   },
+  \ 'disabled' : !has('lua'),
+  \ 'vim_version' : '7.3.885',
   \ }
-NeoBundle 't9md/vim-choosewin'
+NeoBundleLazy 'Shougo/neosnippet', {
+  \ 'autoload' : {
+  \   'insert' : 1,
+  \   },
+  \ }
+NeoBundleLazy 'Shougo/neosnippet-snippets', {
+  \ 'autoload' : {
+  \   'insert' : 1,
+  \   },
+  \ }
+NeoBundleLazy 'koron/codic-vim', {
+  \ 'autoload' : {
+  \   'commands' : 'Codic',
+  \   },
+  \ }
+NeoBundleLazy 'rhysd/unite-codic.vim', {
+  \ 'depends' : [
+  \   'koron/codic-vim',
+  \   'Shougo/unite.vim',
+  \   ],
+  \ 'autoload' : {
+  \   'unite_sources' : ['codic'],
+  \   },
+  \ }
+NeoBundleLazy 't9md/vim-choosewin', {
+  \ 'autoload' : {
+  \   'mappings' : [
+  \     '<Plug>(choosewin)'
+  \     ],
+  \   'commands' : 'ChooseWin',
+  \   },
+  \ }
 NeoBundle 'kana/vim-submode'
-NeoBundle 'glidenote/memolist.vim'
+NeoBundleLazy 'glidenote/memolist.vim', {
+  \ 'autoload' : {
+  \   'commands' : [
+  \     'MemoNew',
+  \     'MemoList',
+  \     'MemoGrep',
+  \     ],
+  \   },
+  \ }
 NeoBundleLazy 'tyru/restart.vim', {
   \ 'gui' : 1,
   \ 'autoload' : {
   \   'commands' : 'Restart',
   \   }
   \ }
-NeoBundle 'osyo-manga/vim-anzu'
-NeoBundle 'itchyny/calendar.vim'
-NeoBundle 'tyru/caw.vim'
-NeoBundle 'scrooloose/syntastic'
+NeoBundleLazy 'osyo-manga/vim-anzu', {
+  \ 'autoload' : {
+  \   'mappings' : [
+  \     '<Plug>(anzu-',
+  \     ],
+  \   },
+  \ 'vim_version' : '7.3.867',
+  \ }
+NeoBundleLazy 'itchyny/calendar.vim', {
+  \ 'autoload' : {
+  \   'commands' : 'Calendar'
+  \   },
+  \ }
+NeoBundleLazy 'tyru/caw.vim', {
+  \ 'autoload' : {
+  \   'mappings' : [
+  \     '<Plug>(caw:'
+  \     ],
+  \   },
+  \ }
+NeoBundleLazy 'scrooloose/syntastic', {
+  \ 'autoload' : {
+  \   'insert' : 1,
+  \   },
+  \ }
 NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'ujihisa/unite-colorscheme'
+NeoBundleLazy 'ujihisa/unite-colorscheme', {
+  \ 'depends' : 'Shougo/unite.vim',
+  \ 'autoload' : {
+  \   'unite_sources' : ['colorscheme'],
+  \   },
+  \ }
 NeoBundleLazy 'nosami/Omnisharp', {
-  \ 'autoload' : {'filetypes': ['cs']},
+  \ 'autoload' : {'filetypes' : ['cs']},
+  \ 'disabled' : !has('python'),
   \ 'build' : {
   \   'windows' : 'MSBuild.exe ~/.vim/bundle/Omnisharp/server/OmniSharp.sln /p:Platform="Any CPU"',
   \   'mac'     : 'xbuild server/OmniSharp.sln',
@@ -297,6 +484,10 @@ NeoBundle 'kana/vim-operator-user'
 "NeoBundle 'nanotech/jellybeans.vim'
 NeoBundle 'tomasr/molokai'
 colorscheme molokai
+" }}}
+"---------------------------------------
+" Finalize NeoBundle {{{
+"---------------------------------------
 " 読み込んだプラグインも含め、ファイルタイプの検出、ファイルタイプ別プラグイン/インデントを有効化する
 filetype plugin indent on
 " インストールのチェック
@@ -545,7 +736,7 @@ let g:quickrun_config = {}
 " runnerオプション：実行方法設定（非同期実行／更新間隔40秒）
 " outputterオプション：バッファの開き方設定（水平分割／ウィンドウの高さ5行／出力がない場合は自動で閉じる）
 let g:quickrun_config['_'] = {
-  \ 'hook/vimshellkawaii/enable' : 1,
+  \ 'hook/kawaii/enable' : 1,
   \ 'outputter/buffer/split' : ':botright 5sp',
   \ 'outputter/buffer/close_on_empty' : 1,
   \ 'outputter/error/error' : 'quickfix',
@@ -579,7 +770,7 @@ endif
 " QuickRun時にコマンドラインに表示するアニメーション
 call quickrun#module#register(
   \ shabadou#make_quickrun_hook_anim(
-    \ 'vimshellkawaii',
+    \ 'kawaii',
     \ [
     \   " (*'-')? ",
     \   " (*'-')! ",
@@ -738,7 +929,7 @@ endfunction
 " }}}
 
 "-------------------------------------------------------------------------------
-" キーマップ
+" 基本キーマップ
 "-------------------------------------------------------------------------------
 " 基本 {{{
 "---------------------------------------
@@ -791,16 +982,52 @@ nnoremap <silent> tc :<C-u>tabclose<CR>
 "---------------------------------------
 " エディット {{{
 "---------------------------------------
-nnoremap <silent> ev :<C-u>edit $MYVIMRC<CR>
-nnoremap <silent> eg :<C-u>edit $MYGVIMRC<CR>
+nnoremap <silent> [Space]ev :<C-u>edit $MYVIMRC<CR>
+nnoremap <silent> [Space]eg :<C-u>edit $MYGVIMRC<CR>
 " }}}
-"---------------------------------------
+
+"-------------------------------------------------------------------------------
+" ファイルタイプ別キーマップ
+"-------------------------------------------------------------------------------
 " help {{{
 "---------------------------------------
-" q で help を閉じる
-AutocmdFT help nnoremap <buffer> q <C-w>c
+function! s:FileTypeMappings_help()
+  " q で help を閉じる
+  nnoremap <buffer> q <C-w>c
+endfunction
+AutocmdFT help call s:FileTypeMappings_help()
 " }}}
 "---------------------------------------
+" markdown {{{
+"---------------------------------------
+function! s:FileTypeMappings_markdown()
+  " ToDo 用マッピング {{{
+  " todoリストを簡単に入力する
+  " NOTE: 'tl '->'- [ ]'
+  inoremap <buffer> tl<Space> - [ ]<Space>
+  " todoリストのon/offを切り替える
+  nnoremap <buffer> <Space><Space> :call ToggleCheckbox()<CR>
+  vnoremap <buffer> <Space><Space> :call ToggleCheckbox()<CR>
+  " 選択行のチェックボックスを切り替える
+  function! ToggleCheckbox()
+    let l:line = getline('.')
+    if l:line =~ '\-\s\[\s\]'
+      " 完了時刻を挿入する
+      let l:result = substitute(l:line, '-\s\[\s\]', '- [x]', '') . ' [' . strftime("%Y/%m/%d (%a) %H:%M") . ']'
+      call setline('.', l:result)
+    elseif l:line =~ '\-\s\[x\]'
+      let l:result = substitute(substitute(l:line, '-\s\[x\]', '- [ ]', ''), '\s\[\d\{4}.\+]$', '', '')
+      call setline('.', l:result)
+    end
+  endfunction
+  " }}}
+endfunction
+AutocmdFT markdown call s:FileTypeMappings_markdown()
+" }}}
+
+"-------------------------------------------------------------------------------
+" プラグイン用キーマップ
+"-------------------------------------------------------------------------------
 " Unite.vim {{{
 "---------------------------------------
 nnoremap [Unite] <Nop>
@@ -812,7 +1039,6 @@ nnoremap <silent> [Unite]f :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
 nnoremap <silent> [Unite]r :<C-u>Unite -buffer-name=register register<CR>
 nnoremap <silent> [Unite]m :<C-u>Unite file_mru<CR>
 nnoremap <silent> [Unite]c :<C-u>Unite codic -start-insert<CR>
-nnoremap <silent> [Unite]l :<C-u>Unite line<CR>
 nnoremap <silent> [Unite]o :<C-u>Unite -no-quit -vertical -winwidth=36 -direction=botright outline<CR>
 nnoremap          [Unite]p :<C-u>Unite output:
 nnoremap <silent> [Unite]u :<C-u>Unite menu:shortcut<CR>
@@ -821,6 +1047,10 @@ nnoremap <silent> [Space]g  :<C-u>Unite mymapping_list -input=[Space]g<CR>
 nnoremap <silent> [Space]gr :<C-u>Unite grep:. -no-quit -buffer-name=grep-result<CR>
 nnoremap <silent> [Space]gw :<C-u>Unite grep:. -no-quit -buffer-name=grep-result<CR><C-R><C-W><CR>
 nnoremap <silent> [Space]gR :<C-u>UniteResume grep-result<CR>
+" UniqueSettings[Search]
+nnoremap <silent> [Space]/ :<C-u>Unite line -start-insert -auto-highlight -buffer-name=search<CR>
+nnoremap <silent> [Space]* :<C-u>UniteWithCursorWord line -auto-highlight -buffer-name=search<CR>
+nnoremap <silent> [Space]? :<C-u>UniteResume search -no-start-insert<CR>
 " }}}
 "---------------------------------------
 " vimshell {{{
