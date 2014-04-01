@@ -57,6 +57,9 @@ if s:is_windows
   set guifont=Consolas:h9:cSHIFTJIS
 
 elseif s:is_mac
+  " 「Monaco」
+  " （半角全角：Monaco／サイズ11）
+  set guifont=Monaco\ 11
 
 elseif s:is_unix
   " 「Monospace」
@@ -121,9 +124,9 @@ if s:is_windows
   Autocmd GUIEnter * simalt ~x
 elseif s:is_mac
   " ウインドウの幅
-  set columns=120
+  set columns=172
   " ウインドウの高さ
-  set lines=39
+  set lines=56
 elseif s:is_unix
   " ウインドウの幅
   set columns=120
