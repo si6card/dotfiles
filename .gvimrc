@@ -62,7 +62,7 @@ if s:is_windows
 elseif s:is_mac
   " 「Monaco」
   " （半角全角：Monaco／サイズ11）
-  set guifont=Monaco\ 11
+  set guifont=Monaco:h11
 
 elseif s:is_unix
   " 「Monospace」
@@ -130,6 +130,8 @@ elseif s:is_mac
   set columns=172
   " ウインドウの高さ
   set lines=56
+  " 半透明化
+  set transparency=10
 elseif s:is_unix
   " ウインドウの幅
   set columns=120
