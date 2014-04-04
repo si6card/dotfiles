@@ -24,6 +24,7 @@ Autocmd BufWinEnter,ColorScheme *vimrc call s:hl_my_autocmd()
 " }}}
 "---------------------------------------
 " 環境判定用変数 {{{
+" NOTE: うまいこと判定できるかな？とりあえず困ってない
 "---------------------------------------
 let s:is_windows = has('win32') || has('win64') || has('win32unix')
 let s:is_mac = has('mac') || has('macunix')
@@ -282,11 +283,6 @@ NeoBundleLazy 'rhysd/clever-f.vim', {
       \   'mappings' : ['f', 'F', 't', 'T'],
       \   },
       \ }
-NeoBundleLazy 'tacroe/unite-mark', {
-      \ 'autoload' : {
-      \   'unite_sources' : ['mark'],
-      \   },
-      \ }
 " テキストオブジェクト拡張 {{{
 NeoBundle 'kana/vim-textobj-user'
 " バッファ全体[ae/ie]
@@ -393,6 +389,16 @@ set directory=~/.vim/swp
 if !isdirectory(expand('~/.vim/swp'))
   call mkdir(expand('~/.vim/swp'), 'p')
 endif
+" アンドゥファイル関連
+if has('undofile')
+  " アンドゥファイルを作る
+  set undofile
+  set directory=~/.vim/undo
+  " アンドゥファイルの出力先指定（出力先が存在しない場合は自動作成）
+  if !isdirectory(expand('~/.vim/undo'))
+    call mkdir(expand('~/.vim/undo'), 'p')
+  endif
+endif
 " マッピングタイムアウト設定 マッピング2.5秒 キーコード0.1秒
 set timeout timeoutlen=2500 ttimeoutlen=100
 " K は man ではなく help がいい
@@ -443,7 +449,7 @@ set scrolloff=5
 set hidden
 " 挿入モード・検索モードでのデフォルトのIME状態設定
 set iminsert=0 imsearch=0
-" クリップボードをWindowsと連携
+" クリップボード連携
 set clipboard=unnamed
 " 新しい行のインデントを現在行と同じにする
 set autoindent
@@ -783,9 +789,10 @@ let g:neocomplete#sources#syntax#min_keyword_length = 3
 let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 " キーワード
 if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}" }}}
+    let g:neocomplete#keyword_patterns = {}
 endif
 let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+" }}}
 
 "---------------------------------------
 " neosnippet {{{
@@ -1014,7 +1021,7 @@ nnoremap Q <Nop>
 nnoremap ZZ <Nop>
 nnoremap ZQ <Nop>
 " 検索時強調表示停止
-nnoremap <silent> [Space]n :<C-u>nohlsearch<CR>
+nnoremap <silent> <Esc><Esc> :<C-u>nohlsearch<CR>
 " メニュー表示／非表示
 map <silent> <F2> :<Bar>
       \ if &guioptions =~# 'm' <Bar>
@@ -1036,8 +1043,14 @@ nnoremap <silent> - $
 nnoremap <silent> ^ 0
 " <Tab> = %
 " NOTE: matchit のマッピングを再帰的に使用するために noremap ではなく map にする
-nmap <TAB> %
-xmap <TAB> %
+" NOTE: nmap で <TAB> を潰すと Ctrl-i でジャンプできなくなるのでコメントアウト
+"nmap <TAB> %
+"xmap <TAB> %
+" マーク
+nnoremap <silent> mm mm
+nnoremap <silent> mu 'm
+"nnoremap <silent> mn ]'
+"nnoremap <silent> mp ['
 " }}}
 "---------------------------------------
 " 入力／編集 {{{
@@ -1054,15 +1067,18 @@ xnoremap x "_x
 xnoremap X "_X
 " Y で カーソル位置移行をヤンク
 nnoremap <silent> Y y$
-" 連続put
+" 連続プット用
 nnoremap <silent> [Space]p "0p
 xnoremap <silent> [Space]p "0p
 " 空行入力
-nnoremap <silent> [Space]o o<Esc>
+nnoremap <silent> <CR> o<Esc>
 " 現在日付を入力
 inoremap <silent> <C-d>ymd <C-R>=strftime("%Y/%m/%d")<CR>
 " 現在時刻を入力
 inoremap <silent> <C-d>hm <C-R>=strftime("%H:%M")<CR>
+" ',' -> ',<Space>'
+inoremap <silent> , ,<Space>
+inoremap <silent> ,<CR> ,<CR>
 " }}}
 "---------------------------------------
 " タブ操作 {{{
@@ -1263,16 +1279,18 @@ endfunction
 
 
 "-------------------------------------------------------------------------------
-" Test
-" NOTE: help vim-script-intro
+" Vim-Script Test
+" NOTE: help vim-script-intro, help functions
 "-------------------------------------------------------------------------------
-" unite-marker {{{
+" {{{
 "---------------------------------------
-nnoremap <unique> <script> <Plug>(mkr-add)    <SID>MkAdd
-nnoremap <unique> <script> <Plug>(mkr-del)    <SID>MkDel
-nnoremap <unique> <script> <Plug>(mkr-jump-p) <SID>MkJumpP
-nnoremap <unique> <script> <Plug>(mkr-jump-n) <SID>MkJumpN
-nnoremap <SID>MkAdd :call <SID>MkAdd()<CR>
-function s:MkAdd()
+" common function
+function! s:str2list(str)
+  return split(a:str, '\zs')
 endfunction
+" variable
+" mapping
+" function
+" test autocmd
+" test mapping
 " }}}
