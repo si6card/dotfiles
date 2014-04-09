@@ -131,7 +131,7 @@ elseif s:is_mac
   " ウインドウの高さ
   set lines=56
   " 半透明化
-  set transparency=10
+  set transparency=5
 elseif s:is_unix
   " ウインドウの幅
   set columns=120

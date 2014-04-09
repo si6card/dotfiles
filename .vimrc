@@ -1067,10 +1067,10 @@ xnoremap x "_x
 xnoremap X "_X
 " Y で カーソル位置移行をヤンク
 nnoremap <silent> Y y$
-" 連続プット用
+" 最後にヤンクしたテキストをプット
 nnoremap <silent> [Space]p "0p
 xnoremap <silent> [Space]p "0p
-" 空行入力
+" ノーマルモード空行入力
 nnoremap <silent> <CR> o<Esc>
 " 現在日付を入力
 inoremap <silent> <C-d>ymd <C-R>=strftime("%Y/%m/%d")<CR>
@@ -1079,6 +1079,9 @@ inoremap <silent> <C-d>hm <C-R>=strftime("%H:%M")<CR>
 " ',' -> ',<Space>'
 inoremap <silent> , ,<Space>
 inoremap <silent> ,<CR> ,<CR>
+" ';' -> ';<Space>'
+inoremap <silent> ; ;<Space>
+inoremap <silent> ;<CR> ;<CR>
 " }}}
 "---------------------------------------
 " タブ操作 {{{
