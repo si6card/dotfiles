@@ -283,6 +283,7 @@ NeoBundleLazy 'rhysd/clever-f.vim', {
       \   'mappings' : ['f', 'F', 't', 'T'],
       \   },
       \ }
+NeoBundle 'tacroe/unite-mark'
 " テキストオブジェクト拡張 {{{
 NeoBundle 'kana/vim-textobj-user'
 " バッファ全体[ae/ie]
@@ -389,15 +390,12 @@ set directory=~/.vim/swp
 if !isdirectory(expand('~/.vim/swp'))
   call mkdir(expand('~/.vim/swp'), 'p')
 endif
-" アンドゥファイル関連
-if has('undofile')
-  " アンドゥファイルを作る
-  set undofile
-  set directory=~/.vim/undo
-  " アンドゥファイルの出力先指定（出力先が存在しない場合は自動作成）
-  if !isdirectory(expand('~/.vim/undo'))
-    call mkdir(expand('~/.vim/undo'), 'p')
-  endif
+" アンドゥファイルを作る
+set undofile
+set undodir=~/.vim/undo
+" アンドゥファイルの出力先指定（出力先が存在しない場合は自動作成）
+if !isdirectory(expand('~/.vim/undo'))
+  call mkdir(expand('~/.vim/undo'), 'p')
 endif
 " マッピングタイムアウト設定 マッピング2.5秒 キーコード0.1秒
 set timeout timeoutlen=2500 ttimeoutlen=100
@@ -657,7 +655,7 @@ let g:vimfiler_enable_auto_cd = 1
 "---------------------------------------
 " 動的プロンプト設定
 let g:my_vimshell_prompt_counter = -1
-function! g:my_vimshell_dynamic_prompt()
+function! s:my_vimshell_dynamic_prompt()
   let g:my_vimshell_prompt_counter += 1
   let anim = [
         \        "(´･_･`)",
@@ -674,7 +672,7 @@ function! g:my_vimshell_dynamic_prompt()
         \    ]
   return anim[g:my_vimshell_prompt_counter % len(anim)]
 endfunction
-let g:vimshell_prompt_expr = 'g:my_vimshell_dynamic_prompt()." > "'
+let g:vimshell_prompt_expr = 's:my_vimshell_dynamic_prompt()." > "'
 let g:vimshell_prompt_pattern = '^([ ´･_･`]\{5}) > '
 " }}}
 
@@ -1037,18 +1035,21 @@ map <silent> <F2> :<Bar>
 "---------------------------------------
 " 0 で行の初めの非空白文字へ移動
 nnoremap <silent> 0 ^
+xnoremap <silent> 0 ^
 " - で行末へ移動
 nnoremap <silent> - $
+xnoremap <silent> - $<Left>
 " ^ で行頭へ移動
 nnoremap <silent> ^ 0
+xnoremap <silent> ^ 0
 " <Tab> = %
 " NOTE: matchit のマッピングを再帰的に使用するために noremap ではなく map にする
 " NOTE: nmap で <TAB> を潰すと Ctrl-i でジャンプできなくなるのでコメントアウト
 "nmap <TAB> %
 "xmap <TAB> %
 " マーク
-nnoremap <silent> mm mm
-nnoremap <silent> mu 'm
+"nnoremap <silent> mm mm
+"nnoremap <silent> mu 'm
 "nnoremap <silent> mn ]'
 "nnoremap <silent> mp ['
 " }}}
@@ -1072,16 +1073,17 @@ nnoremap <silent> [Space]p "0p
 xnoremap <silent> [Space]p "0p
 " ノーマルモード空行入力
 nnoremap <silent> <CR> o<Esc>
+nnoremap <silent> <S-CR> O<Esc>
 " 現在日付を入力
 inoremap <silent> <C-d>ymd <C-R>=strftime("%Y/%m/%d")<CR>
 " 現在時刻を入力
 inoremap <silent> <C-d>hm <C-R>=strftime("%H:%M")<CR>
-" ',' -> ',<Space>'
-inoremap <silent> , ,<Space>
-inoremap <silent> ,<CR> ,<CR>
-" ';' -> ';<Space>'
-inoremap <silent> ; ;<Space>
-inoremap <silent> ;<CR> ;<CR>
+"" ',' -> ',<Space>'
+"inoremap <silent> , ,<Space>
+"inoremap <silent> ,<CR> ,<CR>
+"" ';' -> ';<Space>'
+"inoremap <silent> ; ;<Space>
+"inoremap <silent> ;<CR> ;<CR>
 " }}}
 "---------------------------------------
 " タブ操作 {{{
@@ -1215,7 +1217,6 @@ nmap n <Plug>(anzu-n-with-echo)
 nmap N <Plug>(anzu-N-with-echo)
 nmap * <Plug>(anzu-star-with-echo)
 nmap # <Plug>(anzu-sharp-with-echo)
-"nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
 " }}}
 "---------------------------------------
 " calendar.vim {{{
@@ -1285,15 +1286,122 @@ endfunction
 " Vim-Script Test
 " NOTE: help vim-script-intro, help functions
 "-------------------------------------------------------------------------------
-" {{{
-"---------------------------------------
-" common function
-function! s:str2list(str)
-  return split(a:str, '\zs')
-endfunction
-" variable
-" mapping
-" function
-" test autocmd
-" test mapping
-" }}}
+"" vim-marker {{{
+""---------------------------------------
+"nnoremap <unique> <script> <Plug>(mkr-init-idx)     <SID>MkInitIdx
+"nnoremap <unique> <script> <Plug>(mkr-clear)        <SID>MkClear
+"nnoremap <unique> <script> <Plug>(mkr-buff-add)     <SID>MkBuffAdd
+""nnoremap <unique> <script> <Plug>(mkr-buff-del)     <SID>MkBuffDel
+"nnoremap <unique> <script> <Plug>(mkr-buff-jump-p)  <SID>MkBuffJumpP
+"nnoremap <unique> <script> <Plug>(mkr-buff-jump-n)  <SID>MkBuffJumpN
+""nnoremap <unique> <script> <Plug>(mkr-file-write)   <SID>MkFileWrite
+"nnoremap <unique> <script> <Plug>(mkr-list)         <SID>MkList
+"nnoremap <SID>MkInitIdx   :call <SID>MkInitIdx()<CR>
+"nnoremap <SID>MkClear     :call <SID>MkClear()<CR>
+"nnoremap <SID>MkBuffAdd   :call <SID>MkBuffAdd()<CR>
+""nnoremap <SID>MkBuffDel   :call <SID>MkBuffDel()<CR>
+"nnoremap <SID>MkBuffJumpP :call <SID>MkBuffJumpP()<CR>
+"nnoremap <SID>MkBuffJumpN :call <SID>MkBuffJumpN()<CR>
+""nnoremap <SID>MkFileWrite :call <SID>MkFileWrite()<CR>
+"nnoremap <SID>MkList      :call <SID>MkList()<CR>
+"" common function
+"function! s:str2list(str)
+"  return split(a:str, '\zs')
+"endfunction
+"" variable
+"if !exists('g:marker_buff_char')
+"  let g:marker_buff_str = 'abcdefghijklmnopqrstuvwxyz'
+"endif
+"let g:marker_buff_char = s:str2list(g:marker_buff_str)
+"let g:marker_buff_curidx = 0
+"let g:marker_buff_list_viewer = 0
+"" mapping
+"" function
+""function! s:MkFileRead()
+""  if filereadable(expand('~/.cache/marker/.marker_save.vim'))
+""    unlet g:marker_buff_curidx
+""    source ~/.cache/marker/.marker_save.vim
+""  else
+""    call s:MkFileWrite()
+""  endif
+""endfunction
+""function! s:MkFileWrite()
+""  if !isdirectory(expand('~/.cache/marker'))
+""    call mkdir(expand('~/.cache/marker'), 'p')
+""  endif
+""  let list = ['let g:marker_buff_curidx = ' . g:marker_buff_curidx]
+""  call writefile(list, expand('~/.cache/marker/.marker_save.vim'))
+""endfunction
+"function! s:MkInitIdx()
+"  let idx = 0
+"  for mkchar in g:marker_buff_char
+"    let mkpos = getpos("'" . mkchar)
+"    if mkpos[1] == 0
+"      unlet g:marker_buff_curidx
+"      let g:marker_buff_curidx = idx
+"      break
+"    endif
+"    let idx += 1
+"  endfor
+"endfunction
+"function! s:MkClear()
+"  call s:MkClearBuff()
+"  echo ''
+"endfunction
+"function! s:MkClearBuff()
+"  unlet g:marker_buff_curidx
+"  let g:marker_buff_curidx = 0
+"  execute 'delmarks' g:marker_buff_str
+"endfunction
+"function! s:MkBuffAdd()
+"  execute 'mark' g:marker_buff_char[g:marker_buff_curidx]
+"  echo 'marked' g:marker_buff_char[g:marker_buff_curidx]
+"  let g:marker_buff_curidx = (g:marker_buff_curidx + 1) % len(g:marker_buff_char)
+"  execute 'delmarks' g:marker_buff_char[g:marker_buff_curidx]
+"endfunction
+""function! s:MkBuffDel()
+""  echo ''
+""  let curpos = getpos(".")
+""  for mkchar in g:marker_buff_char
+""    let mkpos = getpos("'" . mkchar)
+""    if mkpos[1] == curpos[1]
+""      execute 'delmarks' mkchar
+""      echo 'delmark' mkchar
+""      break
+""    endif
+""  endfor
+""endfunction
+"function! s:MkBuffJumpP()
+"  call feedkeys("['")
+"  echo ''
+"endfunction
+"function! s:MkBuffJumpN()
+"  call feedkeys("]'")
+"  echo ''
+"endfunction
+"function! s:MkList()
+"  echo ''
+"  if g:marker_buff_list_viewer == 1
+"    " unite-vim
+"    " 未実装
+"  elseif g:marker_buff_list_viewer == 2
+"    " quickfix
+"    " 未実装
+"  else
+"    " marks command
+"    execute 'marks'
+"  endif
+"endfunction
+"" test autocmd
+""Autocmd BufEnter * call s:MkFileRead()
+"Autocmd BufEnter * call s:MkInitIdx()
+"" test mapping
+"nmap mi <Plug>(mkr-init-idx)
+"nmap mc <Plug>(mkr-clear)
+"nmap mm <Plug>(mkr-buff-add)
+"nmap mn <Plug>(mkr-buff-jump-n)
+"nmap mp <Plug>(mkr-buff-jump-p)
+""nmap md <Plug>(mkr-buff-del)
+""nmap mf <Plug>(mkr-file-write)
+"nmap ml <Plug>(mkr-list)
+"" }}}
