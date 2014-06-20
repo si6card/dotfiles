@@ -390,12 +390,15 @@ set directory=~/.vim/swp
 if !isdirectory(expand('~/.vim/swp'))
   call mkdir(expand('~/.vim/swp'), 'p')
 endif
-" アンドゥファイルを作る
-set undofile
-set undodir=~/.vim/undo
-" アンドゥファイルの出力先指定（出力先が存在しない場合は自動作成）
-if !isdirectory(expand('~/.vim/undo'))
-  call mkdir(expand('~/.vim/undo'), 'p')
+" アンドゥ関連
+if has('persistent_undo')
+  " アンドゥファイルを作る
+  set undofile
+  set undodir=~/.vim/undo
+  " アンドゥファイルの出力先指定（出力先が存在しない場合は自動作成）
+  if !isdirectory(expand('~/.vim/undo'))
+    call mkdir(expand('~/.vim/undo'), 'p')
+  endif
 endif
 " マッピングタイムアウト設定 マッピング2.5秒 キーコード0.1秒
 set timeout timeoutlen=2500 ttimeoutlen=100
