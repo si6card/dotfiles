@@ -17,8 +17,8 @@ command! -nargs=* Autocmd autocmd MyVimrc <args>
 command! -nargs=* AutocmdFT autocmd MyVimrc FileType <args>
 " Autocmd/AutocmdFT highlight
 function! s:hl_my_autocmd()
-    highlight def link myVimAutocmd vimAutoCmd
-    syntax match vimAutoCmd /\<\(Autocmd\|AutocmdFT\)\>/
+  highlight def link myVimAutocmd vimAutoCmd
+  syntax match vimAutoCmd /\<\(Autocmd\|AutocmdFT\)\>/
 endfunction
 Autocmd BufWinEnter,ColorScheme *vimrc call s:hl_my_autocmd()
 " }}}
@@ -436,8 +436,8 @@ set showtabline=2
 set showmatch
 " コマンドラインの高さ (Windows用gvim使用時はgvimrcを編集すること)
 set cmdheight=2
-" 長い行の折り返しをしない
-set nowrap
+" 長い行の折り返しをする
+set wrap
 " ウィンドウ開閉時に自動でウィンドウサイズを変更しない
 set noequalalways
 " スクロール時の余白確保
@@ -1036,6 +1036,11 @@ map <silent> <F2> :<Bar>
 "---------------------------------------
 " 移動 {{{
 "---------------------------------------
+" 折り返し行に対応
+nnoremap <silent> j gj
+xnoremap <silent> j gj
+nnoremap <silent> k gk
+xnoremap <silent> k gk
 " 0 で行の初めの非空白文字へ移動
 nnoremap <silent> 0 ^
 xnoremap <silent> 0 ^
@@ -1055,6 +1060,11 @@ xnoremap <silent> ^ 0
 "nnoremap <silent> mu 'm
 "nnoremap <silent> mn ]'
 "nnoremap <silent> mp ['
+" ウィンドウ移動
+nnoremap <silent> <Up> <C-W>k
+nnoremap <silent> <Down> <C-W>j
+nnoremap <silent> <Left> <C-W>h
+nnoremap <silent> <Right> <C-W>l
 " }}}
 "---------------------------------------
 " 入力／編集 {{{
@@ -1073,7 +1083,9 @@ xnoremap X "_X
 nnoremap <silent> Y y$
 " 最後にヤンクしたテキストをプット
 nnoremap <silent> [Space]p "0p
+nnoremap <silent> [Space]P "0P
 xnoremap <silent> [Space]p "0p
+xnoremap <silent> [Space]P "0P
 " ノーマルモード空行入力
 nnoremap <silent> <CR> o<Esc>
 nnoremap <silent> <S-CR> O<Esc>
