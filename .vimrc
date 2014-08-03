@@ -664,7 +664,11 @@ let g:vimfiler_enable_auto_cd = 1
 "---------------------------------------
 " vimshell {{{
 "---------------------------------------
+<<<<<<< HEAD
 "" 動的プロンプト設定
+=======
+" 動的プロンプト設定
+>>>>>>> 1febab84b2ed8f37c66c1f1d93411cf953f90e2d
 "let g:my_vimshell_prompt_counter = -1
 "function! s:my_vimshell_dynamic_prompt()
 "  let g:my_vimshell_prompt_counter += 1
@@ -1214,6 +1218,7 @@ nnoremap <silent> [Unite]c :<C-u>Unite codic<CR>
 nnoremap <silent> [Unite]o :<C-u>Unite -no-quit -vertical -winwidth=36 -direction=botright outline<CR>
 nnoremap          [Unite]p :<C-u>Unite output:
 nnoremap <silent> [Unite]u :<C-u>Unite menu:shortcut<CR>
+nnoremap <silent> [Unite]n :<C-u>Unite -start-insert file/new<CR>
 " UniqueSettings[grep]
 nnoremap <silent> [Space]g  :<C-u>Unite sort_mapping -input=[Space]g<CR>
 nnoremap <silent> [Space]gr :<C-u>Unite grep:. -no-quit -buffer-name=grep-result<CR>
