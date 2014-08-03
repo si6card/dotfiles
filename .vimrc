@@ -390,7 +390,7 @@ set directory=~/.vim/swp
 if !isdirectory(expand('~/.vim/swp'))
   call mkdir(expand('~/.vim/swp'), 'p')
 endif
-" アンドゥ関連
+" アンドゥファイル関連
 if has('persistent_undo')
   " アンドゥファイルを作る
   set undofile
@@ -404,6 +404,8 @@ endif
 set timeout timeoutlen=2500 ttimeoutlen=100
 " K は man ではなく help がいい
 set keywordprg=:help
+" 音を消す
+set visualbell t_vb=
 " }}}
 "---------------------------------------
 " 外観 {{{
@@ -457,7 +459,8 @@ set autoindent
 " cindent有効
 set cindent
 " ファイル内の <tab> が対応する空白の数
-set tabstop=4 shiftwidth=4 softtabstop=4
+set tabstop=2 shiftwidth=2 softtabstop=2
+"set tabstop=4 shiftwidth=4 softtabstop=4
 " <Tab>でSpaceを入力
 set expandtab
 " インデントを shiftwidth の倍数で丸め
@@ -502,7 +505,8 @@ endif
 " vim {{{
 "---------------------------------------
 function! s:FileTypeSettings_vim()
-  setlocal tabstop=2 shiftwidth=2 softtabstop=2
+  " <tab> 幅
+  setlocal tabstop=4 shiftwidth=4 softtabstop=4
 endfunction
 AutocmdFT vim call s:FileTypeSettings_vim()
 " }}}
@@ -510,6 +514,8 @@ AutocmdFT vim call s:FileTypeSettings_vim()
 " c {{{
 "---------------------------------------
 function! s:FileTypeSettings_c()
+  " <tab> 幅
+  set tabstop=2 shiftwidth=2 softtabstop=2
   " <TAB>入力を<TAB>にする
   setlocal noexpandtab
   " switch-case文のインデントを調整
@@ -521,6 +527,8 @@ AutocmdFT c call s:FileTypeSettings_c()
 " markdown {{{
 "---------------------------------------
 function! s:FileTypeSettings_markdown()
+  " <tab> 幅
+  set tabstop=2 shiftwidth=2 softtabstop=2
   " 折り返しを有効にする
   setlocal wrap
   " 80文字で折り返す
@@ -568,7 +576,7 @@ AutocmdFT markdown call s:FileTypeSettings_markdown()
 " Unite.vim {{{
 "---------------------------------------
 " Insertモードで開始
-"let g:unite_enable_start_insert = 1
+let g:unite_enable_start_insert = 1
 " yank履歴ON
 let g:unite_source_history_yank_enable = 1
 
@@ -656,27 +664,27 @@ let g:vimfiler_enable_auto_cd = 1
 "---------------------------------------
 " vimshell {{{
 "---------------------------------------
-" 動的プロンプト設定
-let g:my_vimshell_prompt_counter = -1
-function! s:my_vimshell_dynamic_prompt()
-  let g:my_vimshell_prompt_counter += 1
-  let anim = [
-        \        "(´･_･`)",
-        \        "( ´･_･)",
-        \        "(  ´･_)",
-        \        "(   ´･)",
-        \        "(    ´)",
-        \        "(     )",
-        \        "(     )",
-        \        "(`    )",
-        \        "(･`   )",
-        \        "(_･`  )",
-        \        "(･_･` )",
-        \    ]
-  return anim[g:my_vimshell_prompt_counter % len(anim)]
-endfunction
-let g:vimshell_prompt_expr = 's:my_vimshell_dynamic_prompt()." > "'
-let g:vimshell_prompt_pattern = '^([ ´･_･`]\{5}) > '
+"" 動的プロンプト設定
+"let g:my_vimshell_prompt_counter = -1
+"function! s:my_vimshell_dynamic_prompt()
+"  let g:my_vimshell_prompt_counter += 1
+"  let anim = [
+"        \        "(´･_･`)",
+"        \        "( ´･_･)",
+"        \        "(  ´･_)",
+"        \        "(   ´･)",
+"        \        "(    ´)",
+"        \        "(     )",
+"        \        "(     )",
+"        \        "(`    )",
+"        \        "(･`   )",
+"        \        "(_･`  )",
+"        \        "(･_･` )",
+"        \    ]
+"  return anim[g:my_vimshell_prompt_counter % len(anim)]
+"endfunction
+"let g:vimshell_prompt_expr = 's:my_vimshell_dynamic_prompt()." > "'
+"let g:vimshell_prompt_pattern = '^([ ´･_･`]\{5}) > '
 " }}}
 
 "---------------------------------------
@@ -698,10 +706,10 @@ let g:choosewin_tabline_replace = 1
 " vim-submode {{{
 "---------------------------------------
 " ウィンドウサイズ変更モード
-call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
-call submode#enter_with('winsize', 'n', '', '<C-w><', '<C-w><')
-call submode#enter_with('winsize', 'n', '', '<C-w>+', '<C-w>-')
-call submode#enter_with('winsize', 'n', '', '<C-w>-', '<C-w>+')
+call submode#enter_with('winsize', 'n', '', 't>', '<C-w>>')
+call submode#enter_with('winsize', 'n', '', 't<', '<C-w><')
+call submode#enter_with('winsize', 'n', '', 't+', '<C-w>-')
+call submode#enter_with('winsize', 'n', '', 't-', '<C-w>+')
 call submode#map('winsize', 'n', '', '>', '<C-w>>')
 call submode#map('winsize', 'n', '', '<', '<C-w><')
 call submode#map('winsize', 'n', '', '+', '<C-w>-')
@@ -711,6 +719,15 @@ call submode#enter_with('changetab', 'n', '', 'tn', 'gt')
 call submode#enter_with('changetab', 'n', '', 'tp', 'gT')
 call submode#map('changetab', 'n', '', 'n', 'gt')
 call submode#map('changetab', 'n', '', 'p', 'gT')
+" ウィンドウ移動モード
+call submode#enter_with('changewin', 'n', '', 'tk', '<C-w>k')
+call submode#enter_with('changewin', 'n', '', 'tj', '<C-w>j')
+call submode#enter_with('changewin', 'n', '', 'th', '<C-w>h')
+call submode#enter_with('changewin', 'n', '', 'tl', '<C-w>l')
+call submode#map('changewin', 'n', '', 'k', '<C-w>k')
+call submode#map('changewin', 'n', '', 'j', '<C-w>j')
+call submode#map('changewin', 'n', '', 'h', '<C-w>h')
+call submode#map('changewin', 'n', '', 'l', '<C-w>l')
 " }}}
 
 "---------------------------------------
@@ -1041,30 +1058,28 @@ nnoremap <silent> j gj
 xnoremap <silent> j gj
 nnoremap <silent> k gk
 xnoremap <silent> k gk
+nnoremap <silent> gj j
+xnoremap <silent> gj j
+nnoremap <silent> gk k
+xnoremap <silent> gk k
 " 0 で行の初めの非空白文字へ移動
 nnoremap <silent> 0 ^
 xnoremap <silent> 0 ^
 " - で行末へ移動
 nnoremap <silent> - $
-xnoremap <silent> - $<Left>
+xnoremap <silent> - $
 " ^ で行頭へ移動
 nnoremap <silent> ^ 0
 xnoremap <silent> ^ 0
-" <Tab> = %
+" <C-K> = %
 " NOTE: matchit のマッピングを再帰的に使用するために noremap ではなく map にする
-" NOTE: nmap で <TAB> を潰すと Ctrl-i でジャンプできなくなるのでコメントアウト
-"nmap <TAB> %
-"xmap <TAB> %
+nmap <C-K> %
+xmap <C-K> %
 " マーク
 "nnoremap <silent> mm mm
 "nnoremap <silent> mu 'm
 "nnoremap <silent> mn ]'
 "nnoremap <silent> mp ['
-" ウィンドウ移動
-nnoremap <silent> <Up> <C-W>k
-nnoremap <silent> <Down> <C-W>j
-nnoremap <silent> <Left> <C-W>h
-nnoremap <silent> <Right> <C-W>l
 " }}}
 "---------------------------------------
 " 入力／編集 {{{
@@ -1079,7 +1094,7 @@ nnoremap x "_x
 nnoremap X "_X
 xnoremap x "_x
 xnoremap X "_X
-" Y で カーソル位置移行をヤンク
+" Y で カーソル位置以降をヤンク
 nnoremap <silent> Y y$
 " 最後にヤンクしたテキストをプット
 nnoremap <silent> [Space]p "0p
@@ -1101,15 +1116,39 @@ inoremap <silent> <C-d>hm <C-R>=strftime("%H:%M")<CR>
 "inoremap <silent> ;<CR> ;<CR>
 " }}}
 "---------------------------------------
-" タブ操作 {{{
+" タブ／ウィンドウ操作 {{{
 "---------------------------------------
+" タブ制御
 nnoremap <silent> te :<C-u>tabedit<CR>
 nnoremap <silent> tc :<C-u>tabclose<CR>
-nnoremap <silent> tf :<C-u>tabfirst<CR>
-nnoremap <silent> tl :<C-u>tablast<CR>
+"nnoremap <silent> tf :<C-u>tabfirst<CR>
+"nnoremap <silent> tl :<C-u>tablast<CR>
+" タブ移動
 " 下のタブ移動キーマップは submode を使用しない場合に必要
 "nnoremap <silent> tn :<C-u>tabnext<CR>
 "nnoremap <silent> tp :<C-u>tabprevious<CR>
+" ウィンドウ操作
+nnoremap <silent> tt :<C-u>new<CR>
+nnoremap <silent> tv :<C-u>vnew<CR>
+nnoremap <silent> tq :<C-u>close<CR>
+nnoremap <silent> tQ :<C-u>bd<CR>
+nnoremap <silent> tK <C-W>K
+nnoremap <silent> tJ <C-W>J
+nnoremap <silent> tH <C-W>H
+nnoremap <silent> tL <C-W>L
+"nnoremap <silent> t> <C-W>>
+"nnoremap <silent> t< <C-W><
+"nnoremap <silent> t+ <C-W>+
+"nnoremap <silent> t- <C-W>-
+" ウィンドウ移動
+"nnoremap <silent> tk <C-W>k
+"nnoremap <silent> tj <C-W>j
+"nnoremap <silent> th <C-W>h
+"nnoremap <silent> tl <C-W>l
+nnoremap <silent> <Up> <C-W>k
+nnoremap <silent> <Down> <C-W>j
+nnoremap <silent> <Left> <C-W>h
+nnoremap <silent> <Right> <C-W>l
 " }}}
 "---------------------------------------
 " エディット {{{
@@ -1168,10 +1207,10 @@ nmap [Space]u [Unite]
 nnoremap <silent> [Unite]  :<C-u>Unite sort_mapping -input=[Unite]<CR>
 nnoremap <silent> [Unite]y :<C-u>Unite history/yank<CR>
 nnoremap <silent> [Unite]b :<C-u>Unite buffer<CR>
-nnoremap <silent> [Unite]f :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+nnoremap <silent> [Unite]f :<C-u>UniteWithBufferDir -buffer-name=files file file/new directory/new<CR>
 nnoremap <silent> [Unite]r :<C-u>Unite -buffer-name=register register<CR>
 nnoremap <silent> [Unite]m :<C-u>Unite file_mru<CR>
-nnoremap <silent> [Unite]c :<C-u>Unite codic -start-insert<CR>
+nnoremap <silent> [Unite]c :<C-u>Unite codic<CR>
 nnoremap <silent> [Unite]o :<C-u>Unite -no-quit -vertical -winwidth=36 -direction=botright outline<CR>
 nnoremap          [Unite]p :<C-u>Unite output:
 nnoremap <silent> [Unite]u :<C-u>Unite menu:shortcut<CR>
@@ -1181,7 +1220,7 @@ nnoremap <silent> [Space]gr :<C-u>Unite grep:. -no-quit -buffer-name=grep-result
 nnoremap <silent> [Space]gw :<C-u>Unite grep:. -no-quit -buffer-name=grep-result<CR><C-R><C-W><CR>
 nnoremap <silent> [Space]gR :<C-u>UniteResume grep-result<CR>
 " UniqueSettings[Search]
-nnoremap <silent> [Space]/ :<C-u>Unite line -start-insert -auto-highlight -buffer-name=search<CR>
+nnoremap <silent> [Space]/ :<C-u>Unite line -auto-highlight -buffer-name=search<CR>
 nnoremap <silent> [Space]* :<C-u>UniteWithCursorWord line -auto-highlight -buffer-name=search<CR>
 nnoremap <silent> [Space]? :<C-u>UniteResume search -no-start-insert<CR>
 " }}}
