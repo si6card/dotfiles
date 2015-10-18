@@ -57,7 +57,7 @@ if s:is_windows
   " （半角：Consolas／サイズ9）
   " （全角：フォントリンクされたフォント／サイズ同じ）
   " NOTE: レジストリを修正しフォントリンクしていない場合は日本語が化ける
-  set guifont=Consolas:h9:cSHIFTJIS
+  set guifont=Consolas:h10:cSHIFTJIS
 
 elseif s:is_mac
   " 「Monaco」

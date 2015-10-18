@@ -1,6 +1,24 @@
 "-------------------------------------------------------------------------------
 " Initialize VIM
 "-------------------------------------------------------------------------------
+" OS check {{{
+"---------------------------------------
+let s:is_windows = has('win32') || has('win64') || has('win32unix')
+let s:is_mac = has('mac') || has('macunix')
+let s:is_unix = has('unix')
+" }}}
+"---------------------------------------
+" set encoding {{{
+"---------------------------------------
+if s:is_windows
+  " Not change
+elseif s:is_mac
+  set encoding=utf-8
+elseif s:is_unix
+  set encoding=utf-8
+endif
+" }}}
+"---------------------------------------
 " scriptencoding {{{
 "---------------------------------------
 scriptencoding utf-8
@@ -23,26 +41,7 @@ endfunction
 Autocmd BufWinEnter,ColorScheme *vimrc call s:hl_my_autocmd()
 " }}}
 "---------------------------------------
-" 環境判定用変数 {{{
-" NOTE: うまいこと判定できるかな？とりあえず困ってない
-"---------------------------------------
-let s:is_windows = has('win32') || has('win64') || has('win32unix')
-let s:is_mac = has('mac') || has('macunix')
-let s:is_unix = has('unix')
-" }}}
-"---------------------------------------
-" エンコード指定 {{{
-"---------------------------------------
-if s:is_windows
-  " windows の場合は標準のまま使用
-elseif s:is_mac
-  set encoding=utf-8
-elseif s:is_unix
-  set encoding=utf-8
-endif
-" }}}
-"---------------------------------------
-" runtimepath設定 {{{
+" set runtimepath {{{
 "---------------------------------------
 " vim起動時のみruntimepathに ~/.vim を追加
 if has('vim_starting')
@@ -50,7 +49,7 @@ if has('vim_starting')
 endif
 " }}}
 "---------------------------------------
-" 環境変数 {{{
+" environmental variables {{{
 "---------------------------------------
 if has('vim_starting')
   if !exists('$MYGVIMRC')
@@ -71,8 +70,9 @@ if has('vim_starting')
   set runtimepath+=~/.vim/bundle/neobundle.vim
 endif
 " neobundle.vimの初期化
-call neobundle#rc(expand('~/.vim/bundle'))
+"call neobundle#rc(expand('~/.vim/bundle'))
 " NeoBundleを更新するための設定
+call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
 " }}}
 "---------------------------------------
@@ -310,6 +310,7 @@ colorscheme molokai
 "---------------------------------------
 " Finalize NeoBundle {{{
 "---------------------------------------
+call neobundle#end()
 " 読み込んだプラグインも含め、ファイルタイプの検出、ファイルタイプ別プラグイン/インデントを有効化する
 filetype plugin indent on
 " インストールのチェック
@@ -405,7 +406,9 @@ set timeout timeoutlen=2500 ttimeoutlen=100
 " K は man ではなく help がいい
 set keywordprg=:help
 " 音を消す
-set visualbell t_vb=
+if s:is_mac
+  set visualbell t_vb=
+endif
 " }}}
 "---------------------------------------
 " 外観 {{{
@@ -427,6 +430,7 @@ set cursorline
 " ステータスラインを常に表示
 set laststatus=2
 " シンタックス
+" *** runtimepath 設定後に実施しないと意味がない ***
 syntax enable
 " 画面最後の行をできる限り表示する
 set display=lastline
@@ -436,6 +440,8 @@ set ambiwidth=double
 set showtabline=2
 " 閉じ括弧が入力されたとき、対応する括弧を表示する
 set showmatch
+" showmatch時の時間（default:5 = 0.5sec)
+set matchtime=1
 " コマンドラインの高さ (Windows用gvim使用時はgvimrcを編集すること)
 set cmdheight=2
 " 長い行の折り返しをする
@@ -448,8 +454,10 @@ set scrolloff=5
 "---------------------------------------
 " 入力／編集 {{{
 "---------------------------------------
-" バッファを隠れた状態にする
-set hidden
+" ウィンドウを閉じたらバッファも閉じる
+set nohidden
+"" バッファを隠れた状態にする
+"set hidden
 " 挿入モード・検索モードでのデフォルトのIME状態設定
 set iminsert=0 imsearch=0
 " クリップボード連携
@@ -460,7 +468,6 @@ set autoindent
 set cindent
 " ファイル内の <tab> が対応する空白の数
 set tabstop=2 shiftwidth=2 softtabstop=2
-"set tabstop=4 shiftwidth=4 softtabstop=4
 " <Tab>でSpaceを入力
 set expandtab
 " インデントを shiftwidth の倍数で丸め
@@ -480,6 +487,8 @@ AutocmdFT * setlocal textwidth=0
 set wildmenu
 " 補完時にプレビューウィンドウを表示しない
 set completeopt=menuone
+" 補完メニューの高さ
+set pumheight=15
 " }}}
 "---------------------------------------
 " 検索 {{{
@@ -506,7 +515,7 @@ endif
 "---------------------------------------
 function! s:FileTypeSettings_vim()
   " <tab> 幅
-  setlocal tabstop=4 shiftwidth=4 softtabstop=4
+  setlocal tabstop=2 shiftwidth=2 softtabstop=2
 endfunction
 AutocmdFT vim call s:FileTypeSettings_vim()
 " }}}
@@ -515,7 +524,7 @@ AutocmdFT vim call s:FileTypeSettings_vim()
 "---------------------------------------
 function! s:FileTypeSettings_c()
   " <tab> 幅
-  set tabstop=2 shiftwidth=2 softtabstop=2
+  setlocal tabstop=4 shiftwidth=4 softtabstop=4
   " <TAB>入力を<TAB>にする
   setlocal noexpandtab
   " switch-case文のインデントを調整
@@ -528,13 +537,15 @@ AutocmdFT c call s:FileTypeSettings_c()
 "---------------------------------------
 function! s:FileTypeSettings_markdown()
   " <tab> 幅
-  set tabstop=2 shiftwidth=2 softtabstop=2
+  setlocal tabstop=2 shiftwidth=2 softtabstop=2
   " 折り返しを有効にする
   setlocal wrap
   " 80文字で折り返す
   setlocal textwidth=80
   " マルチバイト文字の場合も折り返しを有効にする
   setlocal formatoptions+=m
+  " アンダーバーやアスタリスクを記述してもイタリックにならないようにする
+  highlight! define link markdownitalic Normal
 
   " <TAB>入力をスペースにする
   setlocal expandtab
@@ -592,8 +603,8 @@ let g:unite_source_alias_aliases = {
       \     "source" : "mapping",
       \   },
       \ }
-call unite#custom_max_candidates("startup_file_mru", 5)
-call unite#custom_max_candidates("startup_directory_mru", 5)
+call unite#custom_max_candidates("startup_file_mru", 10)
+call unite#custom_max_candidates("startup_directory_mru", 10)
 call unite#custom_source('sort_mapping', 'sorters', 'sorter_word')
 " カスタマイズメニュー
 if !exists("g:unite_source_menu_menus")
@@ -611,6 +622,7 @@ let g:unite_source_menu_menus.shortcut = {
       \     [ '[Unite] mapping(Space)', 'Unite sort_mapping -input=Space' ],
       \     [ '[Unite] menu:fileencoding', 'Unite menu:fileencoding' ],
       \     [ '[Unite] menu:fileformat', 'Unite menu:fileformat' ],
+      \     [ '[Unite] menu:tabset', 'Unite menu:tabset' ],
       \     [ '[NeoBundle] Update', 'Unite neobundle/update -log' ],
       \     [ '[NeoBundle] Log', 'Unite neobundle/log' ],
       \     [ '[Plugin] VimFiler', 'VimFiler' ],
@@ -633,6 +645,16 @@ let g:unite_source_menu_menus.fileformat = {
       \     [ 'fileformat=unix', 'set fileformat=unix' ],
       \     [ 'fileformat=mac', 'set fileformat=mac' ],
       \     [ 'fileformat=dos', 'set fileformat=dos' ],
+      \   ]
+      \ }
+" [tabset]メニュー
+let g:unite_source_menu_menus.tabset = {
+      \ 'description' : 'tab change menu',
+      \ 'command_candidates' : [
+      \     [ 'tabstop=2', 'setlocal tabstop=2 shiftwidth=2 softtabstop=2' ],
+      \     [ 'tabstop=4', 'setlocal tabstop=4 shiftwidth=4 softtabstop=4' ],
+      \     [ 'SoftTab([Space])', 'setlocal expandtab' ],
+      \     [ 'HardTab(<Tab>)', 'setlocal noexpandtab' ],
       \   ]
       \ }
 
@@ -1130,6 +1152,7 @@ nnoremap <silent> tc :<C-u>tabclose<CR>
 " ウィンドウ操作
 nnoremap <silent> tt :<C-u>new<CR>
 nnoremap <silent> tv :<C-u>vnew<CR>
+nnoremap <silent> t= <C-W>=
 nnoremap <silent> tq :<C-u>close<CR>
 nnoremap <silent> tQ :<C-u>bd<CR>
 nnoremap <silent> tK <C-W>K
@@ -1210,6 +1233,7 @@ nnoremap <silent> [Unite]b :<C-u>Unite buffer<CR>
 nnoremap <silent> [Unite]f :<C-u>UniteWithBufferDir -buffer-name=files file file/new directory/new<CR>
 nnoremap <silent> [Unite]r :<C-u>Unite -buffer-name=register register<CR>
 nnoremap <silent> [Unite]m :<C-u>Unite file_mru<CR>
+nnoremap <silent> [Unite]M :<C-u>Unite directory_mru<CR>
 nnoremap <silent> [Unite]c :<C-u>Unite codic<CR>
 nnoremap <silent> [Unite]o :<C-u>Unite -no-quit -vertical -winwidth=36 -direction=botright outline<CR>
 nnoremap          [Unite]p :<C-u>Unite output:
