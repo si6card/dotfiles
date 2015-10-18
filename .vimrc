@@ -70,7 +70,6 @@ if has('vim_starting')
   set runtimepath+=~/.vim/bundle/neobundle.vim
 endif
 " neobundle.vimの初期化
-"call neobundle#rc(expand('~/.vim/bundle'))
 " NeoBundleを更新するための設定
 call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
@@ -81,7 +80,6 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " 他プラグイン読込前 {{{
 if has('clientserver')
   NeoBundle 'thinca/vim-singleton'
-  call singleton#enable()
 endif
 " }}}
 NeoBundle 'vim-jp/vimdoc-ja'
@@ -145,23 +143,25 @@ NeoBundleLazy 'Shougo/unite-outline', {
       \   'unite_sources' : ['outline'],
       \   },
       \ }
-NeoBundleLazy 'thinca/vim-quickrun', {
-      \ 'autoload' : {
-      \   'commands' : 'QuickRun',
-      \   'mappings' : [
-      \     '<Plug>(quickrun',
-      \     ],
-      \   },
-      \ }
-NeoBundleLazy 'osyo-manga/shabadou.vim', {
-      \ 'depends' : 'thinca/vim-quickrun',
-      \ 'autoload' : {
-      \   'commands' : 'QuickRun',
-      \   'mappings' : [
-      \     '<Plug>(quickrun',
-      \     ],
-      \   },
-      \ }
+NeoBundle 'thinca/vim-quickrun'
+"NeoBundleLazy 'thinca/vim-quickrun', {
+"      \ 'autoload' : {
+"      \   'commands' : 'QuickRun',
+"      \   'mappings' : [
+"      \     '<Plug>(quickrun',
+"      \     ],
+"      \   },
+"      \ }
+NeoBundle 'osyo-manga/shabadou.vim'
+"NeoBundleLazy 'osyo-manga/shabadou.vim', {
+"      \ 'depends' : 'thinca/vim-quickrun',
+"      \ 'autoload' : {
+"      \   'commands' : 'QuickRun',
+"      \   'mappings' : [
+"      \     '<Plug>(quickrun',
+"      \     ],
+"      \   },
+"      \ }
 NeoBundleLazy 'Shougo/neocomplete', {
       \ 'autoload' : {
       \   'insert' : 1,
@@ -304,7 +304,7 @@ NeoBundle 'kana/vim-operator-user'
 "NeoBundle 'jeffreyiacono/vim-colors-wombat'
 "NeoBundle 'nanotech/jellybeans.vim'
 NeoBundle 'tomasr/molokai'
-colorscheme molokai
+"colorscheme molokai
 " }}}
 " }}}
 "---------------------------------------
@@ -315,6 +315,8 @@ call neobundle#end()
 filetype plugin indent on
 " インストールのチェック
 NeoBundleCheck
+" singletonだけは先に読み込む
+call singleton#enable()
 " }}}
 
 "-------------------------------------------------------------------------------
